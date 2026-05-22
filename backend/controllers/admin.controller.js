@@ -1,0 +1,71 @@
+const jwt=require('jsonwebtoken')
+const Admin=require('../models/Admin')
+const generateToken=(id)=>{
+    return jwt.sign({id,role:'admin'},process.env.JWT_SECRET,{expiresIn:'3d'})
+}
+
+const adminController= {
+    newUser: async(req,res)=>{
+        try {
+           
+            let data = req.body
+           
+           let duplicatedEmail = await User.findOne({email : data.email}) 
+            if(duplicatedEmail){
+                return res.status(403).send({
+                    message:"Email is already taken !!"
+                })
+            }
+
+            let newUser  = new User(data)
+            await newUser.save()
+            res.status(201).send({
+                message:"Account created !!"
+            })
+ 
+        } catch (error) {
+           
+            res.status(500).send({
+                message: error.message
+        })
+        }
+    },
+    login:async(req,res)=>{
+        try {
+          
+            let {email,password} = req.body
+
+            let user = await User.findOne({email})
+            if(!user){
+               return res.status(403).send({
+                    message:"Inavlid email or password"
+            })
+            }
+
+            let validPassword = await bcrypt.compare(password,user.password)
+            if(!validPassword){
+                return res.status(403).send({
+                    message:"Inavlid email or password"
+            })
+            }
+
+            let secretKey = process.env.SECRET_KEY 
+            let token =await jwt.sign({id:user._id},secretKey)
+
+            res.cookie("access_token",`Berear ${token}`,{
+                httpOnly:true,
+                maxAge:1000* 60 * 60 * 24 * 2 
+            })
+            user.tokens.push(token)
+            user.save()
+            
+            res.send()
+
+        } catch (error) {
+          
+            res.status(500).send({
+                message: error.message
+        })
+        }
+    }
+}
