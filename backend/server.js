@@ -1,48 +1,19 @@
-[nodemon] restarting due to changes...
-[nodemon] starting `node server.js`
-file:///C:/Users/XPRISTO/Desktop/backend/full-stack-1/backend/server.js:2
-const app=express()
-          ^
-
-TypeError: express is not a function
-    at file:///C:/Users/XPRISTO/Desktop/backend/full-stack-1/backend/server.js:2:11
-    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
-    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
-    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
-
-Node.js v20.19.5
-[nodemon] app crashed - waiting for file changes before starting...
-[nodemon] restarting due to changes...
-[nodemon] starting `node server.js`
-file:///C:/Users/XPRISTO/Desktop/backend/full-stack-1/backend/server.js:1
-const express=req('express')
-              ^
-
-ReferenceError: req is not defined
-    at file:///C:/Users/XPRISTO/Desktop/backend/full-stack-1/backend/server.js:1:15
-    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
-    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
-    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
-
-Node.js v20.19.5
-[nodemon] app crashed - waiting for file changes before starting...
-[nodemon] restarting due to changes...
-[nodemon] starting `node server.js`
-file:///C:/Users/XPRISTO/Desktop/backend/full-stack-1/backend/server.js:1
 const express=require('express')
-              ^
-
-ReferenceError: require is not defined in ES module scope, you can use import instead
-This file is being treated as an ES module because it has a '.js' file extension and 'C:\Users\XPRISTO\Desktop\backend\full-stack-1\backend\package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
-    at file:///C:/Users/XPRISTO/Desktop/backend/full-stack-1/backend/server.js:1:15
-    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
-    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
-    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
-
-Node.js v20.19.5const express=require('express')
 const app=express()
 const router=express.Router()
 const dotenv=require('dotenv')
+const authRoutes=require('./routes/auth.route')
+const transactionRoutes=require('./routes/transaction.route')
+const transferRoutes=require('./routes/transfer.route')
+const cardRoutes=require('./routes/card.route')
+const cardTransactionRoutes=require('./routes/cardTransaction.route')
+const userRoutes=require('./routes/user.route')
+const adminRoutes=require('./routes/admin.route')
+const adminUserRoutes=require('./routes/adminUser.route')
+const adminCardRoutes=require('./routes/adminCard.route')
+const adminTransactionRoutes=require('./routes/adminTransaction.route')
+const depositRoutes=require('./routes/deposit.route')
+const notificationRoutes=require('./routes/notification.route')
 const cors=require('cors')
 const connectDB=require('./config/db')
 const PORT=process.env.PORT || 4000
@@ -50,6 +21,18 @@ dotenv.config()
 connectDB()
 app.use(express.json())
 app.use(cors())
+app.use('/api/auth',authRoutes)
+app.use('/api/transactions',transactionRoutes)
+app.use('/api/card',cardRoutes)
+app.use('/api/card-transactions',cardTransactionRoutes)
+app.use('/api/users',userRoutes)
+app.use('/api/admin',adminRoutes)
+app.use('/api/admin/cards',adminCardRoutes)
+app.use('/api/admin/transactions',adminTransactionRoutes)
+app.use('/api/deposit',depositRoutes)
+app.use('/api/notifications',notificationRoutes)
+app.use('/api/transfer',transferRoutes)
+app.use('/api/admin/users',adminUserRoutes)
 app.listen(PORT,()=>{
     console.log(`server running on port ${PORT}`)
 })

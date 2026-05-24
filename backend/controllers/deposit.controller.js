@@ -65,3 +65,4 @@ success:true,message:'success veryfy'
     }
 
 }
+module.exports=depositStripe

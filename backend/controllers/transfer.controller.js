@@ -32,3 +32,4 @@ res.json({message:'sended success'})
   }
 }
 }
+module.exports=transferController

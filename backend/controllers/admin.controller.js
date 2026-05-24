@@ -5,7 +5,7 @@ const generateToken=(id)=>{
 }
 
 const adminController= {
-    newUser: async(req,res)=>{
+    register: async(req,res)=>{
         try {
            
             let data = req.body
@@ -69,3 +69,4 @@ const adminController= {
         }
     }
 }
+module.exports=adminController

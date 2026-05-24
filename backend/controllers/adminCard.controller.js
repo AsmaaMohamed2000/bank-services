@@ -11,3 +11,4 @@ const adminCardController={
         res.json({message:''})
     }
 }
+module.exports=adminCardController

@@ -18,3 +18,4 @@ const adminUserController={
 
     }
 }
+module.exports=adminUserController

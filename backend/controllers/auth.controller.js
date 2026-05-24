@@ -1,9 +1,10 @@
 const User = require("../models/user.model")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const { register } = require("./admin.controller")
 
 const userController= {
-    newUser: async(req,res)=>{
+    register: async(req,res)=>{
         try {
            
             let data = req.body

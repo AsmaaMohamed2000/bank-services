@@ -5,3 +5,4 @@ const transaction=(await Transaction.find().populate('user' ,'name email')).toSo
 res.json(transaction)
 }
 }
+module.exports=adminTransactionController

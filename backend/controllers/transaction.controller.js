@@ -53,3 +53,4 @@ const depositAndWithdrawTransaction={
      }
     }
 }
+module.exports=depositAndWithdrawTransaction

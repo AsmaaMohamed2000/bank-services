@@ -1,0 +1,10 @@
+const express=require('express')
+const {depositToCard, withdrawToCard,getCardBalance,transferToCard,transferToAccount} =require('../controllers/cardTransaction.controller')
+const auth=require('../middlewares/authMiddleware')
+const router=express.Router()
+router.get('/balance',auth,getCardBalance)
+router.post('/deposit',auth,depositToCard)
+router.post('/withdraw',auth,withdrawToCard)
+router.post('/to-card',auth,transferToCard)
+router.post('/to-account',auth,transferToAccount)
+module.exports=router
