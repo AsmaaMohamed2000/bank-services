@@ -1,16 +1,34 @@
 const mongoose=require('mongoose')
+const crypto=require('crypto')
 const transactionSchema=new mongoose.Schema({
-     user:{
-                type:mongoose.Schema.Types.ObjectId ,ref:'User',required:true
+    sender:{
+                type:mongoose.Schema.Types.ObjectId ,ref:'Account'
+            },
+            receiver:{
+                type:mongoose.Schema.Types.ObjectId ,ref:'Account'
             },
     type:{
-        type:String,enum:['deposit','withdraw','transfer','receive',
-'deposit-card','withdraw-to-card','transfer-to-card','transfer-to-account'
+        type:String,enum:['deposit','withdraw','transfer',
         ],required:true
     },
+    sourceType:{
+        type:String, enum:['account','card','bank']
+    },
+    destinationType:{
+        type:String, enum:['account','card','bank']
+    },
     amount:{type:Number,required:true},
-    date:{type:Date,default:Date.now},
-receiver:{type:String}
+    status:{
+        type:String ,enum:['pending' ,'success' ,'failed']
+    }
+    ,reference:{
+        type:String , unique:true ,required:true 
+    }
+},{timestamps:true})
+transactionSchema.pre('save' ,function(next){
+    if(!this.reference){
+        this.reference=`TRK-${crypto.randomBytes(5).toString('hex')}`
+    }
+    next()
 })
-
 module.exports=mongoose.model('Transaction',transactionSchema)

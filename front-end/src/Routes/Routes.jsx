@@ -12,6 +12,9 @@ import Notification from "../pages/Notification/Notification";
 import MyCard from "../pages/MyCard/MyCard";
 import Transaction from "../pages/Transaction/Transaction";
 import NotFound from "../pages/NotFound/NotFound";
+import VerifyOtp from "../pages/verifyOtp/VerifyOtp";
+import ForgotPassword from "../pages/forgotPassword/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword/ResetPassword";
 
 function Routess() {
   return (
@@ -70,6 +73,9 @@ function Routess() {
 
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+          <Route path="verify-otp" element={<VerifyOtp />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+               <Route path="reset-password" element={<ResetPassword/>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

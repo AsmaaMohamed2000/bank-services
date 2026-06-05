@@ -1,15 +1,17 @@
 import { motion } from "framer-motion"
 import { Wallet ,ArrowDownCircle,ArrowUpCircle} from "lucide-react"
 import { useState } from "react"
+import { useSelector } from "react-redux"
 
 function Dashbord() {
+  const user=useSelector(state=>state.auth.user)
   const [loading,setLoading]=useState('')
     const [amount,setAmount]=useState(false)
       const [userBalance,setUserBalance]=useState(1200.5)
         const [cardBalance,setCardBalance]=useState(350.75)
-  const user={
-    name:'asmaa'
-  }
+  // const user={
+  //   name:'asmaa'
+  // }
   const handleStripeDeposite=()=>{
     if(!amount|| Number(amount)<=0 ||isNaN(amount)){
       alert('please enter correct amount')
@@ -76,7 +78,7 @@ function Dashbord() {
 <div className="w-24 h-24 mx-auto bg-linear-to-tr from-yellow-400 to-purple-400  rounded-full flex items-center justify-center mb-4 shadow-lg">
 <Wallet size={42}/>
 </div>
-<h2 className="text-3xl font-extrabold tracking-wide">Welcome {user?.name || 'User' } </h2>
+<h2 className="text-3xl font-extrabold tracking-wide">Welcome {user?.fullName|| 'User' } </h2>
 
   <p className="text-gray-300 mt-2">Manage your bank account easily and securely </p>
 
@@ -87,7 +89,7 @@ function Dashbord() {
 <p className="text-3xl font-bold mt-2 text-yellow-300"> $ {userBalance.toFixed(2)}</p>
 </motion.div>
 <motion.div className="bg-linear-to-r from-blue-700/60 to-cyan-500/50  p-6 rounded-2xl text-center">
-<h2 className="text-3xl font-extrabold tracking-wide">Welcome {user?.name || 'User' } </h2>
+<h2 className="text-3xl font-extrabold tracking-wide">Welcome {user?.fullName|| 'User' } </h2>
 
   <p className="text-gray-300 mt-2">Manage your bank account easily and securely </p>
 
