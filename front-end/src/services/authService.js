@@ -1,5 +1,6 @@
 import axiosInstance from '../api/axois'
 
+
 export const registerUser = async(data)=>{
 
    const response = await axiosInstance.post(

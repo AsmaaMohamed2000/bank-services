@@ -15,6 +15,7 @@ import NotFound from "../pages/NotFound/NotFound";
 import VerifyOtp from "../pages/verifyOtp/VerifyOtp";
 import ForgotPassword from "../pages/forgotPassword/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword/ResetPassword";
+import OpenAccount from "../pages/Acount/OpenAcount";
 
 function Routess() {
   return (
@@ -76,6 +77,7 @@ function Routess() {
           <Route path="verify-otp" element={<VerifyOtp />} />
             <Route path="forgot-password" element={<ForgotPassword />} />
                <Route path="reset-password" element={<ResetPassword/>} />
+                   <Route path="open-acount" element={<OpenAccount/>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

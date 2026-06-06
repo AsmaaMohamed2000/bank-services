@@ -9,9 +9,6 @@ function Dashbord() {
     const [amount,setAmount]=useState(false)
       const [userBalance,setUserBalance]=useState(1200.5)
         const [cardBalance,setCardBalance]=useState(350.75)
-  // const user={
-  //   name:'asmaa'
-  // }
   const handleStripeDeposite=()=>{
     if(!amount|| Number(amount)<=0 ||isNaN(amount)){
       alert('please enter correct amount')

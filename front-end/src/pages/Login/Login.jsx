@@ -20,9 +20,10 @@ function Login() {
       const result =
          await loginUser(data)
       if(result.success){
+        console.log(result.user)
 dispatch(setUser(result.user))
 toast.success('loged in  Successfully')
-navigate('/',{replace:true})
+navigate('/open-acount',{replace:true})
       }
 
    }catch(err){

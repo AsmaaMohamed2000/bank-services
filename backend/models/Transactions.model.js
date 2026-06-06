@@ -1,34 +1,93 @@
-const mongoose=require('mongoose')
-const crypto=require('crypto')
-const transactionSchema=new mongoose.Schema({
-    sender:{
-                type:mongoose.Schema.Types.ObjectId ,ref:'Account'
-            },
-            receiver:{
-                type:mongoose.Schema.Types.ObjectId ,ref:'Account'
-            },
-    type:{
-        type:String,enum:['deposit','withdraw','transfer',
-        ],required:true
+const mongoose = require('mongoose')
+const crypto = require('crypto')
+
+const transactionSchema = new mongoose.Schema({
+    sender: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Account'
     },
-    sourceType:{
-        type:String, enum:['account','card','bank']
+
+    receiver: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Account'
     },
-    destinationType:{
-        type:String, enum:['account','card','bank']
+
+    initiatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
-    amount:{type:Number,required:true},
-    status:{
-        type:String ,enum:['pending' ,'success' ,'failed']
+
+    type: {
+        type: String,
+        enum: ['deposit', 'withdraw', 'transfer'],
+        required: true
+    },
+
+    sourceType: {
+        type: String,
+        enum: ['account', 'card', 'bank']
+    },
+
+    destinationType: {
+        type: String,
+        enum: ['account', 'card', 'bank']
+    },
+
+    amount: {
+        type: Number,
+        required: true
+    },
+
+    fee: {
+        type: Number,
+        default: 0
+    },
+
+    currency: {
+        type: String,
+        default: 'EGP'
+    },
+
+    description: {
+        type: String
+    },
+
+    balanceBefore: {
+        type: Number
+    },
+
+    balanceAfter: {
+        type: Number
+    },
+
+    status: {
+        type: String,
+        enum: ['pending', 'success', 'failed'],
+        default: 'pending'
+    },
+
+    failureReason: {
+        type: String
+    },
+
+    processedAt: {
+        type: Date
+    },
+
+    reference: {
+        type: String,
+        unique: true
     }
-    ,reference:{
-        type:String , unique:true ,required:true 
-    }
-},{timestamps:true})
-transactionSchema.pre('save' ,function(next){
-    if(!this.reference){
-        this.reference=`TRK-${crypto.randomBytes(5).toString('hex')}`
+
+}, {
+    timestamps: true
+})
+
+transactionSchema.pre('save', function (next) {
+    if (!this.reference) {
+        this.reference = TRX-${crypto.randomBytes(6).toString('hex')}
     }
     next()
 })
-module.exports=mongoose.model('Transaction',transactionSchema)
+
+module.exports = mongoose.model('Transaction', transactionSchema)
