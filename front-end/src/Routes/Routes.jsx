@@ -78,6 +78,7 @@ function Routess() {
             <Route path="forgot-password" element={<ForgotPassword />} />
                <Route path="reset-password" element={<ResetPassword/>} />
                    <Route path="open-acount" element={<OpenAccount/>} />
+                     <Route path="deposit-success" element={<VerifyDeposit/>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

@@ -26,7 +26,7 @@ const accountSchema = new mongoose.Schema({
 
     balance: {
         type: Number,
-        default: 0
+        default: 4444
     },
 
     availableBalance: {
@@ -63,4 +63,4 @@ const accountSchema = new mongoose.Schema({
     timestamps: true
 })
 
-module.exports = mongoose.model('Account', accountSchema)
+module.exports =  mongoose.models.Account || mongoose.model('Account', accountSchema);

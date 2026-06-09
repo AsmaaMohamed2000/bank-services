@@ -33,7 +33,7 @@ const accountController = {
 
             const account =
                 await accountService.getMyAccount(
-                    req.body.id
+                    req.body._id
                 )
 
             res.status(200).json({

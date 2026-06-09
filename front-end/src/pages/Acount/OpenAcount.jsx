@@ -17,6 +17,7 @@ if(result.success){
 }
 }catch(err){
 alert(err.response.data.message)
+ navigate('/login',{replace:true})
 }
   };
 

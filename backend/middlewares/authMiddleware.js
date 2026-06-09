@@ -29,23 +29,25 @@ const validate = (schema) => {
     next()
   }
 }
-
+//  req.headers.authorization &&
+//     req.headers.authorization.startsWith("Bearer")
 
 const authMiddleware = async (req, res, next) => {
   let token;
   if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
+   req.cookies.refresh_token
   ) {
     try {
-      token = req.headers.authorization.split(" ")[1];
+      token =  req.cookies.refresh_token
       if (!token) return res.status(401).json({ message: "unAuthorized" });
-      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN);
+      const decoded = jwt.verify(token, process.env.REFRESH_TOKEN);
       req.user = await user.findById(decoded.id);
       next();
     } catch (err) {
       res.status(401).json({ message: err.message });
     }
+  }else{
+     if (!token) return res.status(401).json({ message: "unAuthorized" });
   }
 };
 module.exports = {authMiddleware,validate}

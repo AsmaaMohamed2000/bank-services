@@ -1,7 +1,7 @@
-// const express=require('express')
-// const {getMe,  updateProfile} =require('../controllers/user.controller')
-// const auth=require('../middlewares/authMiddleware')
-// const router=express.Router()
-// router.get('/',auth,getMe)
-// router.put('/update',auth,updateProfile)
-// module.exports=router
+
+const express = require('express')
+const router = express.Router()
+const authMiddlewar =require('../middlewares/authMiddleware')
+const  userController =require('../controllers/user.controller')
+router.get('/get-me',authMiddlewar.authMiddleware,userController.getMe)
+module.exports=router

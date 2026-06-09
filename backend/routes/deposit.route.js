@@ -1,7 +1,7 @@
-// const express=require('express')
-// const {createDepositSessoin, verifyDeposit} =require('../controllers/deposit.controller')
+const express=require('express')
+const { createDepositSession,verifyDeposit} =require('../controllers/deposit.controller')
 // const auth=require('../middlewares/authMiddleware')
-// const router=express.Router()
-// router.post('/create',auth,createDepositSessoin)
-// router.post('/verify',auth,verifyDeposit)
-// module.exports=router
+const router=express.Router()
+router.post('/create-session', createDepositSession)
+router.post('/verify',verifyDeposit)
+module.exports=router

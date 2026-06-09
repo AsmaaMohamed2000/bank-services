@@ -85,7 +85,7 @@ const transactionSchema = new mongoose.Schema({
 
 transactionSchema.pre('save', function (next) {
     if (!this.reference) {
-        this.reference = TRX-${crypto.randomBytes(6).toString('hex')}
+        this.reference =` TRX-${crypto.randomBytes(6).toString('hex')}`
     }
     next()
 })

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import {registerUser} from '../../services/authService'
 import {toast} from "react-toastify"
 import {  useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate ,Link} from "react-router-dom"
 function Register() {
   const navigate=useNavigate()
   const [serverError ,setServerError]=useState('')
@@ -99,6 +99,7 @@ navigate('/verify-otp',{replace:true})
   <motion.button className="w-full cursor-pointer bg-linear-to-r from-purple-600 to-pink-500 hover:from-purple-500  hover:to-yellow-400 text-white py-3 rounded-xl font-bold  transition " whileHover={{scale:1.05}} type="submit" disabled={isSubmitting}>
      {isSubmitting?'sending...':'register'}
   </motion.button>
+   <Link to='/login' className="mt-4">already has account </Link>
 </form>
 <motion.div className='h-0.5 bg-linear-to-r  from-yellow-400 via-pink-500  to-purple-600 mt-10  rounded-full' initial={{width:0}} animate={{width:'100%'}} transition={{duration:1,delay:0.4}}/>
 <div className="text-center mt-6 text-gray-300 text-sm ">

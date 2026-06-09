@@ -534,7 +534,7 @@ let decoded
     ))
     await user.save()
 
-   return {newAccessToken ,newRefreshToken}
+   return {newAccessToken ,newRefreshToken ,user}
 },
 logout:async(token)=>{
   

@@ -1,7 +1,8 @@
 import { motion } from "framer-motion"
 import { UserPlus ,User,Mail, Lock} from "lucide-react"
 import { useForm } from "react-hook-form"
-import {loginUser} from '../../services/authService'
+import {loginUser } from '../../services/authService'
+import { getAcount } from "../../services/acountService"
 import {toast} from "react-toastify"
 import {  useState } from "react"
 import { Link } from "react-router-dom"
@@ -22,11 +23,24 @@ function Login() {
       if(result.success){
         console.log(result.user)
 dispatch(setUser(result.user))
-toast.success('loged in  Successfully')
-navigate('/open-acount',{replace:true})
-      }
+try{
+        const res =
+         await getAcount(result.user)
 
-   }catch(err){
+if(res.success){
+navigate('/',{replace:true})
+toast.success('loged in  Successfully')
+return
+}}catch(err){
+  navigate('/open-acount',{replace:true})
+  return
+}
+}
+
+
+      
+
+  }catch(err){
     if(err.response.data.type==='validation'){
         err.response.data.errors.forEach((item)=>(
           setError(item.field,{
@@ -80,6 +94,7 @@ navigate('/open-acount',{replace:true})
   <motion.button className="w-full mt-4 cursor-pointer bg-linear-to-r from-purple-600 to-pink-500 hover:from-purple-500  hover:to-yellow-400 text-white py-3 rounded-xl font-bold  transition " whileHover={{scale:1.05}} type="submit" disabled={isSubmitting}>
      {isSubmitting?'sending...':'login'}
   </motion.button>
+  <Link to='/register' className="mt-4">Not Have Account </Link>
 </form>
 <motion.div className='h-0.5 bg-linear-to-r  from-yellow-400 via-pink-500  to-purple-600 mt-10  rounded-full' initial={{width:0}} animate={{width:'100%'}} transition={{duration:1,delay:0.4}}/>
 <div className="text-center mt-6 text-gray-300 text-sm ">

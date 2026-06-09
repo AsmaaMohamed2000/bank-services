@@ -119,7 +119,7 @@ res.cookie('refresh_token',tokens.newRefreshToken,{
     httpOnly:true,sameSite:'strict',secure:false
 })
 res.status(200).json({
-    success:true,accessToken:tokens.newAccessToken
+    success:true,accessToken:tokens.newAccessToken ,user:tokens.user
 })
         }catch(err){
               res.status(400).json({

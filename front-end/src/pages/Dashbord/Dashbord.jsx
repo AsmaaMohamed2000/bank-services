@@ -1,27 +1,47 @@
 import { motion } from "framer-motion"
 import { Wallet ,ArrowDownCircle,ArrowUpCircle} from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { toast } from "react-toastify"
 import { useSelector } from "react-redux"
-
+import { getAcount } from "../../services/acountService"
+import { createDepositSession } from "../../services/deposit"
 function Dashbord() {
   const user=useSelector(state=>state.auth.user)
   const [loading,setLoading]=useState('')
-    const [amount,setAmount]=useState(false)
-      const [userBalance,setUserBalance]=useState(1200.5)
+    const [amount,setAmount]=useState('')
+      const [userBalance,setUserBalance]=useState(null)
         const [cardBalance,setCardBalance]=useState(350.75)
-  const handleStripeDeposite=()=>{
-    if(!amount|| Number(amount)<=0 ||isNaN(amount)){
-      alert('please enter correct amount')
-      return
-    }
-    setLoading(true)
-    setTimeout(() => {
-      setUserBalance((prev)=>prev+Number(amount))
-      setAmount('')
-      setLoading(false)
-      alert(`${amount} withdraw in your account successfully`)
-    }, (1200));
+useEffect(()=>{
+if (!user?._id) return;
+  const account=async()=>{
+    try{
+    const res=await getAcount(user)
+    console.log(res)
+    setUserBalance(res.account.balance)
+  }catch(err){
+    console.log(err.response.data.message )
   }
+  }
+  account()
+},[user])
+ const handleDeposit = async()=>{
+
+   if(!amount || Number(amount) <= 0){
+      return toast.error('Invalid amount')
+   }
+
+   try{
+
+      const res = await createDepositSession(amount)
+
+      window.location.href = res.session_url
+
+   }catch(err){
+
+      toast.error(err.response?.data?.message)
+
+   }
+}
   const handleTransaction=(type)=>{
       if(!amount|| Number(amount)<=0 ||isNaN(amount)){
       alert('please enter correct amount')
@@ -83,7 +103,7 @@ function Dashbord() {
 <div className="grid grid-cols-1 sm:grid-cols-2 gap-7 mb-8 ">
 <motion.div className="bg-linear-to-r from-purple-700/60 to-pink-500/50 p-6 rounded-2xl text-center shadow-lg ">
 <h3 className="text-lg text-gray-200 ">Account Balance </h3>
-<p className="text-3xl font-bold mt-2 text-yellow-300"> $ {userBalance.toFixed(2)}</p>
+<p className="text-3xl font-bold mt-2 text-yellow-300"> $ {userBalance?.toFixed(2)}</p>
 </motion.div>
 <motion.div className="bg-linear-to-r from-blue-700/60 to-cyan-500/50  p-6 rounded-2xl text-center">
 <h2 className="text-3xl font-extrabold tracking-wide">Welcome {user?.fullName|| 'User' } </h2>
@@ -94,7 +114,7 @@ function Dashbord() {
 </div>
 <input type="number" className="w-full mb-6 rounded-xl bg-white/10  border border-white/20 text-white placeholder-gray-300 focus:ring-2 focus:ring-purple-400 px-5 py-2 outline-none" placeholder="Enter Amount" value={amount} onChange={(e)=>setAmount(e.target.value )}/>
 <div className="flex flex-col sm:flex-row flex-wrap max-w-[80%] mx-auto justify-center gap-6 mb-8 ">
-<button onClick={handleStripeDeposite} disabled={loading}
+<button onClick={handleDeposit} disabled={loading}
 className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600  py-3 px-3 sm:px-8 rounded-xl font-bold text-white transition"
 >
 

@@ -1,20 +1,20 @@
-// const User=require('../models/User.model')
-// const Cart=require('../models/Card.model')
-// const userController={
-//     getMe:async (req,res)=>{
-//         try{
-// const user=await User.findById(req.user._id)
-// if(!user) return res.status(404).json({message:'User not found'})
+const User=require('../models/User.model')
+const Cart=require('../models/Card.model')
+const userController={
+    getMe:async (req,res)=>{
+        try{
+const user=await User.findById(req.user._id)
+if(!user) return res.status(404).json({message:'User not found'})
 //     let cart=await Cart.findOne({user:req.user._id})
 // cart=cart?{balance:cart.balance,cartNumber:cart.cartNumber,CVV:cart.CVV,expiryDate:cart.expiryDate}:null
-// res.json({
-//     ...user.toObject(),
-// cart
-// })
-//         }catch(error){
-// res.status(404).json({message:error.message})
-//         }
-//     },
+res.json({
+  success:true,
+  user
+})
+        }catch(error){
+res.status(404).json({message:error.message})
+        }
+    },
 //     updateProfile: async(req,res)=>{
 // try{
 //     const {name,email}=req.body
@@ -43,5 +43,5 @@
 // }
 //     }
 
-// }
-// module.exports=userController
+}
+module.exports=userController
