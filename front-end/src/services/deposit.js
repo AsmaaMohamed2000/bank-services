@@ -1,22 +1,22 @@
 import axiosInstance from "../api/axois"
-export const createDepositSession = async(amount)=>{
+export const createDepositSession = async({amount,user})=>{
    const res = await axiosInstance.post(
       '/deposit/create-session',
-      { amount }
+      { amount ,user}
    )
 
    return res.data
 }
-export const verifyDeposit = async({amount,user})=>{
+// export const verifyDeposit = async({amount,user})=>{
 
-   const res = await axiosInstance.post(
+//    const res = await axiosInstance.post(
 
-      '/deposit/verify',
+//       '/deposit/verify',
 
-      {
-         amount,user
-      }
-   )
+//       {
+//          amount,user
+//       }
+//    )
 
-   return res.data
-}
+//    return res.data
+// }

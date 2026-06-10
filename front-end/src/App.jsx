@@ -12,6 +12,7 @@ function App() {
 
 
    useEffect(() => {
+    
   const me = async () => {
     try {
       const result = await getMe();

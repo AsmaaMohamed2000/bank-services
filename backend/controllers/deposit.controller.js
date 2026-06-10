@@ -4,176 +4,142 @@ const Stripe=require('stripe')
 const Account=require('../models/Account.model')
 const stripe=new Stripe(process.env.STRIPE_SECRET_KEY)
 const depositStripe={
-     createDepositSession : async(req,res)=>{
+createDepositSession :async (req, res) => {
+  try {
+    const { amount } = req.body;
 
-   try{
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid amount",
+      });
+    }
 
-      const { amount } = req.body
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
 
-      if(!amount || amount <= 0){
+      mode: "payment",
 
-         return res.status(400).json({
-            success:false,
-            message:'Invalid amount'
-         })
-      }
+      line_items: [
+        {
+          quantity: 1,
 
-      const session =
-         await stripe.checkout.sessions.create({
+          price_data: {
+            currency: "egp",
 
-            payment_method_types:['card'],
+            product_data: {
+              name: "Account Deposit",
+            },
 
-            line_items:[
+            unit_amount: Number(amount) * 100,
+          },
+        },
+      ],
 
-               {
+      metadata: {
+        userId: req.body.user._id.toString(),
+      },
 
-                  price_data:{
+      success_url: "http://localhost:5173/deposit-success",
 
-                     currency:'egp',
+      cancel_url: "http://localhost:5173/dashboard",
+    });
 
-                     product_data:{
-                        name:'Account Deposit'
-                     },
+    res.json({
+      success: true,
+      session_url: session.url,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+},
+stripeWebhook: async (req, res) => {
+  const signature = req.headers["stripe-signature"];
 
-                     unit_amount:
-                        Number(amount) * 100
-                  },
+  let event;
 
-                  quantity:1
-               }
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    return res.status(400).send(err.message);
+  }
 
-            ],
+  try {
+    if (event.type !== "checkout.session.completed") {
+      return res.json({ received: true });
+    }
 
-            mode:'payment',
+    const session = event.data.object;
 
-            success_url:
-             `http://localhost:5173/deposit-success?amount=${amount}`,
+    if (!session || session.payment_status !== "paid") {
+      return res.json({ received: true });
+    }
 
-            cancel_url:
-            `http://localhost:5173/dashboard`
-         })
+    const userId = session.metadata?.userId;
 
-      res.status(200).json({
+    if (!userId) {
+      console.log("Missing userId in metadata");
+      return res.json({ received: true });
+    }
 
-         success:true,
+    const amount = session.amount_total / 100;
 
-         session_url:session.url
-      })
+    const exists = await Transaction.findOne({
+      stripeSessionId: session.id,
+    });
 
-   }catch(err){
+    if (exists) {
+      return res.json({ received: true });
+    }
 
-      res.status(500).json({
+    const account = await Account.findOne({ user: userId });
 
-         success:false,
+    if (!account) {
+      return res.json({ received: true });
+    }
 
-         message:err.message
-      })
-   }},
+    const balanceBefore = account.balance;
 
-   verifyDeposit :async(req,res)=>{
+    account.balance += amount;
+    await account.save();
 
-   try{
+    await Transaction.create({
+      receiver: account._id,
+      initiatedBy: userId,
+      stripeSessionId: session.id,
+      type: "deposit",
+      sourceType: "bank",
+      destinationType: "account",
+      amount,
+      balanceBefore,
+      balanceAfter: account.balance,
+      status: "success",
+      description: "Deposit via Stripe",
+      processedAt: new Date(),
+    });
 
-      const userId = req.body.user._id
+    await Notification.create({
+      user: userId,
+      title: "Deposit Successful",
+      message: `${amount} EGP deposited successfully,`
+    });
 
-      const  amount  = req.body.amount
+    return res.json({ received: true });
 
-      const depositAmount =
-         Number(amount)
-
-      if(!depositAmount){
-
-         return res.status(400).json({
-            success:false,
-            message:'Invalid amount'
-         })
-      }
-
-      const account =
-         await Account.findOne({
-            user:userId
-         })
-
-      if(!account){
-
-         return res.status(404).json({
-            success:false,
-            message:'Account not found'
-         })
-      }
-      const existingTransaction =
-   await Transaction.findOne({
-
-      initiatedBy:userId,
-
-      type:'deposit',
-
-      amount:depositAmount,
-
-      status:'success'
-   })
-   if(existingTransaction){
-
-   return res.json({
-
-      success:true,
-
-      message:'Already processed'
-   })
-}
-account.balance += depositAmount
-
-await account.save()
-await Transaction.create({
-
-   receiver: account._id,
-
-   initiatedBy: userId,
-
-   type: 'deposit',
-
-   sourceType: 'bank',
-
-   destinationType: 'account',
-
-   amount: depositAmount,
-
-   balanceBefore: balanceBefore,
-
-   balanceAfter: account.balance,
-
-   status: 'success',
-
-   description: 'Deposit via Stripe',
-
-   processedAt: new Date()
-})
-await Notification.create({
-
-   user:userId,
-
-   title:'Deposit Successful',
-
-   message:
-    ` ${depositAmount} EGP deposited successfully`
-})
-res.status(200).json({
-
-   success:true,
-
-   message:'Deposit completed',
-
-   balance:account.balance
-})
-}catch(err){
-
-   res.status(500).json({
-
-      success:false,
-
-      message:err.message
-   })
-}
+  } catch (err) {
+    console.log("WEBHOOK ERROR:", err);
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 }
 
 }

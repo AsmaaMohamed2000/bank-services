@@ -8,6 +8,7 @@ const authRoutes=require('./routes/auth.route')
 const accountRouter=require('./routes/acount.route')
 const userRouter=require('./routes/user.route')
 const depositRouter=require('./routes/deposit.route')
+const webhook=require('./routes/webhook')
 // const transactionRoutes=require('./routes/transaction.route')
 // const transferRoutes=require('./routes/transfer.route')
 // const cardRoutes=require('./routes/card.route')
@@ -32,7 +33,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-
+app.use('/api/stripe',webhook)
 app.use(express.json())
 app.use(cookieParser())
 app.use('/api/auth',authRoutes)

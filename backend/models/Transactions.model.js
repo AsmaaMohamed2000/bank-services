@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const crypto = require('crypto')
+const { string } = require('joi')
 
 const transactionSchema = new mongoose.Schema({
     sender: {
@@ -77,17 +78,20 @@ const transactionSchema = new mongoose.Schema({
     reference: {
         type: String,
         unique: true
+    },
+    stripeSessionId:{
+        type:String,unique:true
     }
 
 }, {
     timestamps: true
 })
 
-transactionSchema.pre('save', function (next) {
+transactionSchema.pre('save', function () {
     if (!this.reference) {
         this.reference =` TRX-${crypto.randomBytes(6).toString('hex')}`
     }
-    next()
+    
 })
 
 module.exports = mongoose.model('Transaction', transactionSchema)

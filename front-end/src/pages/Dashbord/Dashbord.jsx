@@ -32,7 +32,7 @@ if (!user?._id) return;
 
    try{
 
-      const res = await createDepositSession(amount)
+      const res = await createDepositSession({amount,user})
 
       window.location.href = res.session_url
 

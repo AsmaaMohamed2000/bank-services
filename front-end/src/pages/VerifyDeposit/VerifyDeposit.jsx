@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CheckCircle, Loader2, XCircle } from 'lucide-react'
-import { verifyDeposit } from '../../services/deposit'
+// import { verifyDeposit } from '../../services/deposit'
 import { useSelector } from 'react-redux'
 
 function VerifyDeposit() {
@@ -13,38 +13,38 @@ const user=useSelector(state=>state.auth.user)
 
   const navigate = useNavigate()
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    const verify = async () => {
+  //   const verify = async () => {
 
-      try {
+  //     try {
 
-        const amount = params.get('amount')
+  //       const amount = params.get('amount')
 
-        if (!amount) {
-          setStatus('error')
-          return
-        }
+  //       if (!amount) {
+  //         setStatus('error')
+  //         return
+  //       }
 
-        await verifyDeposit({amount,user})
+  //       await verifyDeposit({amount,user})
 
-        setStatus('success')
+  //       setStatus('success')
 
-        setTimeout(() => {
-          navigate('/dashboard')
-        }, 2500)
+  //       setTimeout(() => {
+  //         navigate('/dashboard')
+  //       }, 2500)
 
-      } catch (err) {
+  //     } catch (err) {
 
-        console.log(err.response.data.message)
+  //       console.log(err.response.data.message)
 
-        setStatus('error')
-      }
-    }
+  //       setStatus('error')
+  //     }
+  //   }
 
-    verify()
+  //   verify()
 
-  }, [])
+  // }, [])
 
   return (
     <div className='min-h-screen text-white px-6 flex items-center justify-center bg-linear-to-r from-indigo-900 via-purple-900 to-pink-900'>
@@ -67,7 +67,7 @@ const user=useSelector(state=>state.auth.user)
           </div>
         )}
 
-        {status === 'success' && (
+       
           <div className='flex flex-col items-center'>
 
             <CheckCircle className='w-24 h-24 text-green-400 mb-6' />
@@ -85,9 +85,9 @@ const user=useSelector(state=>state.auth.user)
             </p>
 
           </div>
-        )}
+        
 
-        {status === 'error' && (
+        {/* {status === 'error' && (
           <div className='flex flex-col items-center'>
 
             <XCircle className='w-24 h-24 text-red-400 mb-6' />
@@ -101,7 +101,7 @@ const user=useSelector(state=>state.auth.user)
             </p>
 
           </div>
-        )}
+        )} */}
 
       </div>
 
