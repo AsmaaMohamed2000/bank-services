@@ -1,6 +1,6 @@
-// const transaction = require("../models/Transactions.model");
-// const User = require("../models/User.model");
-// const depositAndWithdrawTransaction = {
+
+const transactions=require('../Services/transactions')
+const transactionController = {
 //   deposit: async (req, res) => {
 //     const { amount } = req.body;
 //     const userId = req.user._id;
@@ -43,15 +43,19 @@
 //       res.json({ message: err.message });
 //     }
 //   },
-//   getTransactions: async (req, res) => {
-//     try {
-//       const transactions = (
-//         await transaction.find({ user: req.user._id })
-//       ).toSorted({ date: -1 });
-//       res.json(transactions);
-//     } catch (err) {
-//       res.status(500).json({ message: err.message });
-//     }
-//   },
-// };
-// module.exports = depositAndWithdrawTransaction;
+  getTransactions: async (req, res) => {
+   try{
+const result=await transactions.getTransactions(req.body.user._id)
+res.status(201).json({
+    success:true
+    ,transactions:result
+})
+   }catch(err){
+    res.status(400).json({
+        success:false,
+        message:err.message
+    })
+   }
+  },
+};
+module.exports =  transactionController

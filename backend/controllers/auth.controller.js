@@ -116,7 +116,7 @@ const authController = {
         try{
 const tokens=await authService.regenerateAccessToken(req.cookies.refresh_token)
 res.cookie('refresh_token',tokens.newRefreshToken,{
-    httpOnly:true,sameSite:'strict',secure:false
+    httpOnly:true,sameSite:'strict',secure:false,maxAge:1000*7*24*60*60
 })
 res.status(200).json({
     success:true,accessToken:tokens.newAccessToken ,user:tokens.user

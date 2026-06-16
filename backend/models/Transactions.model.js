@@ -80,7 +80,7 @@ const transactionSchema = new mongoose.Schema({
         unique: true
     },
     stripeSessionId:{
-        type:String,unique:true
+        type:String,unique:true,sparse:true
     }
 
 }, {

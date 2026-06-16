@@ -7,6 +7,6 @@ module.exports=async()=>{
         await mongoose.connect(URL)
         console.log('connected ')
     }catch(err){
-         console.log(err)
+         console.log(err.message)
     }
 }

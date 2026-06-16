@@ -40,9 +40,9 @@ createDepositSession :async (req, res) => {
         userId: req.body.user._id.toString(),
       },
 
-      success_url: "http://localhost:5173/deposit-success",
+      success_url: `http://localhost:5173/deposit-success?session_id={CHECKOUT_SESSION_ID}`,
 
-      cancel_url: "http://localhost:5173/dashboard",
+      cancel_url: "http://localhost:5173/deposit-success?canceled=true",
     });
 
     res.json({
@@ -140,6 +140,30 @@ stripeWebhook: async (req, res) => {
       message: err.message,
     });
   }
+},
+checkDeposit:async(req,res)=>{
+try{
+  const transaction = await Transaction.findOne({
+  stripeSessionId: req.params.sessionId,
+})
+
+if (!transaction) {
+  return res.json({
+    success: false,
+    status: "processing",
+  })
+}
+
+return res.json({
+  success: true,
+  status: "success",
+})
+}catch(err){
+return res.status(500).json({
+  success: false,
+  status: err.message,
+})
+}
 }
 
 }
