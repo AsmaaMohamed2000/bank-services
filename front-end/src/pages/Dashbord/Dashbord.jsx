@@ -5,24 +5,36 @@ import { toast } from "react-toastify"
 import { useSelector } from "react-redux"
 import { getAcount } from "../../services/acountService"
 import { createDepositSession } from "../../services/deposit"
+import { withdraw } from "../../services/withdraw.service"
+import { transfer } from "../../services/transfer.service"
 function Dashbord() {
   const user=useSelector(state=>state.auth.user)
   const [loading,setLoading]=useState('')
     const [amount,setAmount]=useState('')
+      const [type,setType]=useState(null)
       const [userBalance,setUserBalance]=useState(null)
-        const [cardBalance,setCardBalance]=useState(350.75)
+        const [number,setNumber]=useState(null)
+        const [accountNumber,setAccountNumber]=useState(null)
 useEffect(()=>{
-if (!user?._id) return;
-  const account=async()=>{
-    try{
-    const res=await getAcount(user)
-    console.log(res)
-    setUserBalance(res.account.balance)
-  }catch(err){
-    console.log(err.response.data.message )
-  }
-  }
-  account()
+ if (!user){
+      return
+    }
+    const getAccounts=async()=>{
+        try{
+          const res=await getAcount(user)
+         
+          const totalBalance=res.accounts.reduce((sum,curr)=>sum+Number(curr.balance)
+
+          ,0)
+          setUserBalance(totalBalance)
+
+
+      }catch(err){
+        toast.error(err.response.data.message)
+      }
+    }
+    getAccounts()
+   
 },[user])
  const handleDeposit = async()=>{
 
@@ -42,51 +54,62 @@ if (!user?._id) return;
 
    }
 }
-  const handleTransaction=(type)=>{
+  const handleWithdraw=async()=>{
       if(!amount|| Number(amount)<=0 ||isNaN(amount)){
       alert('please enter correct amount')
       return
     }
-    const amount=Number(amount)
-    setLoading(true)
-    setTimeout(() => {
-      switch(type){
-        case 'withdraw' :
-          if(userBalance>=amount){
-            setUserBalance((prev)=>prev-amount)
-            alert(`${amount} withdraw successfuly`)
-
-          }else{
-            alert('userbalance not enough')
-          }
-          break;
-          case 'to-card' :
-            if(userBalance>=amount){
-               setUserBalance((prev)=>prev-amount)
-               setCardBalance((prev)=>prev+amount)
-                alert(`${amount} to card  successfuly`)
-
-            }else{
-            alert('userbalance not enough')
-          }
-          break;
-          case 'to-account' :
-            if(cardBalance>=amount){
-                setUserBalance((prev)=>prev+amount)
-               setCardBalance((prev)=>prev-amount)
-               alert(`${amount} to balance successfuly`)
-
-            }else{
-            alert('userbalance not enough')
-          }
-          break;
-          default :
-          alert('type  operation unknown')
-      }
+   
+    try{
+      const res=await withdraw({amount,user})
+      setUserBalance(res.balance)
+      
+    }catch(err){
+      console.log(err.response.data.message)
+    }finally{
       setLoading(false)
       setAmount('')
-    }, 1000);
+    }
+  
+  
+  
+  
+  
   }
+  const handleTransfer=async(type)=>{
+ if(!amount|| !number || Number(amount)<=0 ){
+      alert('please enter correct information')
+      return
+    }
+    switch(type){
+      case 'to-card':
+        try{
+          const res=await transfer({amount,user,cardNumber:number})
+          setUserBalance(res.balance)
+          toast.success('transfered successfully')
+        }catch(err){
+          toast.error(err.response.data.message)
+        }
+        break;
+      case 'to-account':
+           try{
+          const res=await transfer({amount,user,accountNumber:number})
+          setUserBalance(res.balance)
+          toast.success('transfered successfully')
+        }catch(err){
+          alert(err.response.data.message)
+          toast.error('transfere failed')
+        }finally{
+          setType(null)
+        }
+        break;
+default:
+  break
+
+
+    }
+  }
+    
   return (
     <div className="pt-24  p-6 relative w-full min-h-screen flex items-center justify-center bg-linear-to-br  from-[#0a0f1f] via-[#1a237e] to-[#3f51b5]">
        <motion.div initial={{y:40,opacity:0}} animate={{opacity:1,y:0}} transition={{duration:1}}
@@ -120,20 +143,53 @@ className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-60
 
  {loading?'...':'Deposite through stripe'}  
 </button>
-<button onClick={()=>handleTransaction('withdraw')}
+<button onClick={handleWithdraw}
 className="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600  py-3 px-3 sm:px-8 rounded-xl font-bold text-white transition"
 disabled={loading}>  {loading?'...':'withdraw'}  
 </button>
-<button onClick={()=>handleTransaction('to-card')}
+<button onClick={()=>setType('to-card')}
 className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600  py-3 px-3 sm:px-8 rounded-xl font-bold text-white transition"
 disabled={loading}> {loading?'...':'Transfer to card '}  
 </button>
-<button onClick={()=>handleTransaction('to-account')}
+<button onClick={()=>setType('to-account')}
 className="flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600  py-3 px-3 sm:px-8 rounded-xl font-bold text-white transition"
 disabled={loading}> {loading?'...':'transfer to account'}  
 </button>
+
 </div>
+
        </motion.div>
+       {type&&(
+  <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 ">
+<div className=" w-full max-w-2xl rounded-3xl bg-[#162569] border border-white/20 p-8 shadow-2xl text-white ">
+<div className="flex justify-end mb-6 ">
+    <button
+          onClick={() => setType(null)}
+          className="text-3xl cursor-pointer hover:text-red-400 text-white/60"
+        >
+          ×
+        </button>
+</div>
+<form onSubmit={(e)=>{e.preventDefault() 
+  handleTransfer(type)}} >
+  <div className="mb-7  flex">
+    <label htmlFor="amount" className="text-white/70 text-sm me-5">Amount</label>
+    <input type="text" className="outline-none border border-1 border-blue-300/50 rounded-md  flex-1 py-1 px-2 placeholder-white/50 text-white/70" placeholder="enter amount" value={amount} onChange={(e)=>setAmount(e.target.value)}/>
+  </div>
+   <div  className="mb-7 flex">
+    <label htmlFor="cardNumber" className="text-white/70 text-sm me-5">Account/Card Number</label>
+    <input type="text" className="outline-none border border-1 border-blue-300/50 rounded-md  flex-1 py-1 px-2 placeholder-white/50 text-white/70" placeholder="enter Account or Card Number" value={number} onChange={(e)=>setNumber(e.target.value)}/>
+  </div>
+    {/* <div  className="mb-7 flex ">
+    <label htmlFor="AccountNumber" className="text-white/70 text-sm me-5">Card Number</label>
+    <input type="text" className="outline-none border border-1 border-blue-300/50 rounded-md  flex-1 py-1 px-2 placeholder-white/50 text-white/70" placeholder="enter Card Number" value={accountNumber} onChange={(e)=>setAccountNumber(e.target.value)}/>
+
+  </div> */}
+   <button type="submit"  className="bg-blue-700 px-2 py-1 w-full rounded-3xl  cursor-pointer hover:bg-blue-400/60 text-white">transfer</button>
+</form>
+</div>
+  </div>
+)}
     </div>
   )
 }

@@ -7,7 +7,14 @@ export const registerUser = async(data)=>{
       '/auth/register',
       data
    )
+   return response.data
+}
+export const editUserInfo = async(data)=>{
 
+   const response = await axiosInstance.post(
+      '/auth/editUserInfo',
+      data
+   )
    return response.data}
 
    export const loginUser = async(data)=>{

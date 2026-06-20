@@ -317,6 +317,61 @@ let decoded
 
    return {success:true}
 
+},
+editUserInfo:async(body)=>{
+    const {user,data} = body
+
+
+    const userExist = await User.findById(user._id)
+
+    if (!userExist) {
+      throw new Error('user not found')
+    }
+  if (userExist.isBlocked) {
+      throw new Error('Account is blocked')
+    }
+    if(data.fullName){
+      if(userExist.fullName===data.fullName){
+        throw new Error('user fullName is already exist')
+      }
+      userExist.fullName=data.fullName
+      await userExist.save()
+    }
+  if(data.email){
+      if(userExist.email===data.email){
+        throw new Error('email is already exist')
+      }
+      userExist.email=data.email
+      await userExist.save()
+//           const plainOtp = crypto.randomInt(100000, 999999).toString()
+
+//     const hashedOtp = await bcrypt.hash(plainOtp, 10)
+
+//  const otpp=   await Otp.create({
+//       user: user._id,
+//       code: hashedOtp,
+//       type: 'verify-email',
+//       expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+//     })
+
+    // await sendEmail(data.email, plainOtp)
+    }
+      if(data.phone){
+      if(userExist.phone===data.phone){
+        throw new Error('phone is already exist')
+      }
+      userExist.phone=data.phone
+      await userExist.save()
+    }
+
+
+    return {
+      success: true,
+      // emailVerificationRequire:data.email?true:false,
+      userExist,
+      
+    }
+
 }
 
 }

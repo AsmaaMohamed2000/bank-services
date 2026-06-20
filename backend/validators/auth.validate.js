@@ -100,4 +100,36 @@ const verifyOtpSchema = Joi.object({
     .required()
 
 })
-module.exports={registerSchema,verifyOtpSchema,loginSchema,resetPasswordSchema,forgotPasswordSchema}
+const editUserInfoSchema=Joi.object({
+   fullName: Joi.string()
+    .trim()
+    .min(3)
+    .max(50)
+    .pattern(/^[a-zA-Z\u0600-\u06FF\s]+$/)
+    
+    .messages({
+    
+      'string.min':'Full name must be at least 3 characters',
+      'string.max':'Full name must not exceed 50 characters',
+      'string.pattern.base':'Full name contains invalid characters'
+    }),
+
+  email: Joi.string()
+    .trim()
+    .lowercase()
+    .email()
+   
+    .messages({
+      'string.email':'Invalid email format',
+     
+    }),
+      phone: Joi.string()
+    .pattern(/^01[0125]\d{8}$/)
+    
+    .messages({
+      'string.pattern.base':
+      'Invalid Egyptian phone number'
+    })
+
+})
+module.exports={registerSchema,editUserInfoSchema,verifyOtpSchema,loginSchema,resetPasswordSchema,forgotPasswordSchema}

@@ -20,7 +20,7 @@ const accountSchema = new mongoose.Schema({
 
     accountType: {
         type: String,
-        enum: ['checking', 'saving'],
+        enum: ['checking', 'savings',' business'],
         default: 'checking'
     },
 

@@ -7,16 +7,13 @@ export const createDepositSession = async({amount,user})=>{
 
    return res.data
 }
-// export const verifyDeposit = async({amount,user})=>{
+export const ckeckDeposit = async(sessionId)=>{
 
-//    const res = await axiosInstance.post(
+   const res = await axiosInstance.get(
 
-//       '/deposit/verify',
+      `/deposit/status/${sessionId}`,
 
-//       {
-//          amount,user
-//       }
-//    )
+   )
 
-//    return res.data
-// }
+   return res.data
+}

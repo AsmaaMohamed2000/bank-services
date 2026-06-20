@@ -8,7 +8,7 @@ const accountController = {
 
             const account =
                 await accountService.createAccount(
-                    req.body._id
+                    req.body
                 )
 
             res.status(201).json({
@@ -31,14 +31,14 @@ const accountController = {
 
         try {
 
-            const account =
+            const accounts =
                 await accountService.getMyAccount(
                     req.body._id
                 )
 
             res.status(200).json({
                 success: true,
-                account
+                accounts
             })
 
         } catch (error) {

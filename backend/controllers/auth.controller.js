@@ -19,7 +19,22 @@ const authController = {
             })
         }
     },
+editUser:async(req,res)=>{
+    try{
+        const result=await authService.editUserInfo(req.body)
+             res.status(201).json(result)
 
+        } catch (error) {
+
+            res.status(400).json({
+                success: false,
+                type:'bussiness',
+                message: error.message,
+                errors:[]
+            })
+        
+    }
+},
     verifyOtp: async (req, res) => {
         try {
 

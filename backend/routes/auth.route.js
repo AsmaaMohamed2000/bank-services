@@ -11,6 +11,8 @@ router.post('/verify-otp',auth.validate(validateSchemas.verifyOtpSchema) ,authCo
 router.post('/login',auth.validate(validateSchemas.loginSchema) ,authController.login)
 
 router.post('/refresh-token', authController.refreshToken)
+// auth.validate(validateSchemas.editUserInfoSchema)
+router.post('/editUserInfo',authController.editUser)
 
 router.post('/logout', authController.logout)
 

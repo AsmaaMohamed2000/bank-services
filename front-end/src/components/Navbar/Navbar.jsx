@@ -11,6 +11,7 @@ function Navbar() {
     {path:'/' ,label:'Home'},
       {path:'transactions' ,label:'transactions'},
         {path:'transfer', label:'transfer'},
+        
           {path:'profile', label:'profilee'},
             {path:'mycard', label:'mycard'},
 

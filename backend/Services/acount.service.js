@@ -12,40 +12,46 @@ function generateIBAN() {
 
 const AccountService ={
 
-     createAccount:async(userId)=> {
-
-        const existingAccount = await Account.findOne({
-            user: userId
+     createAccount:async(data)=> {
+const {user,rest}=data
+let existingAccount
+  existingAccount = await Account.findOne({
+             user: user._id, accountType:rest.accountType ||'checking'
         })
-
-        if (existingAccount) {
+         if (existingAccount) {
             throw new Error('Account already exists')
         }
 
+       
+
+       
+
         const account = await Account.create({
-            user: userId,
+            user: user._id,
             accountNumber: generateAccountNumber(),
             iban: generateIBAN(),
             balance: 0,
             availableBalance: 0,
             accountType: 'checking',
-            currency: 'EGP'
+            currency: 'EGP',
+            accountType:rest.accountType ||'checking'
         })
 
         return account
     },
 
      getMyAccount:async(userId)=> {
+      
 
-        const account = await Account.findOne({
+        const accounts = await Account.find({
             user: userId
         })
 
-        if (!account) {
-            throw new Error('Account not found')
+        if (accounts.length===0) {
+            throw new Error('Accounts not found')
         }
 
-        return account
+        return accounts
     }
 }
 

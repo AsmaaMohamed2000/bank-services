@@ -1,57 +1,59 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CheckCircle, Loader2, XCircle } from 'lucide-react'
-// import { verifyDeposit } from '../../services/deposit'
+import { ckeckDeposit } from '../../services/deposit'
 import { useSelector } from 'react-redux'
 
 function VerifyDeposit() {
 const user=useSelector(state=>state.auth.user)
 
-  const [status, setStatus] = useState('loading')
+  const [status, setStatus] = useState('processing')
 
   const [params] = useSearchParams()
+     const session_id = params.get('session_id')
+     const canceled = params.get('canceled')
 
   const navigate = useNavigate()
 
-  // useEffect(() => {
+  useEffect(() => {
+  if (canceled === "true") {
+    setStatus("error");
+    return;
+  }
 
-  //   const verify = async () => {
+  if (!session_id) {
+    setStatus("error");
+    return;
+  }
 
-  //     try {
+  const interval = setInterval(async () => {
+    try {
+      const res = await ckeckDeposit(session_id);
+console.log(res)
+      if (res.status === "success") {
+        clearInterval(interval);
 
-  //       const amount = params.get('amount')
+        setStatus("success");
 
-  //       if (!amount) {
-  //         setStatus('error')
-  //         return
-  //       }
+        setTimeout(() => {
+          navigate("/");
+        }, 2500);
+      }
+    } catch {
+      clearInterval(interval);
+      setStatus("error");
+    }
+  }, 2000);
 
-  //       await verifyDeposit({amount,user})
-
-  //       setStatus('success')
-
-  //       setTimeout(() => {
-  //         navigate('/dashboard')
-  //       }, 2500)
-
-  //     } catch (err) {
-
-  //       console.log(err.response.data.message)
-
-  //       setStatus('error')
-  //     }
-  //   }
-
-  //   verify()
-
-  // }, [])
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <div className='min-h-screen text-white px-6 flex items-center justify-center bg-linear-to-r from-indigo-900 via-purple-900 to-pink-900'>
 
       <div className='text-center flex flex-col items-center'>
 
-        {status === 'loading' && (
+        {status === 'processing' && (
           <div className='flex flex-col items-center'>
 
             <Loader2 className='w-20 h-20 animate-spin text-cyan-400 mb-6' />
@@ -68,7 +70,8 @@ const user=useSelector(state=>state.auth.user)
         )}
 
        
-          <div className='flex flex-col items-center'>
+         {status==='success'&&(
+           <div className='flex flex-col items-center'>
 
             <CheckCircle className='w-24 h-24 text-green-400 mb-6' />
 
@@ -85,9 +88,10 @@ const user=useSelector(state=>state.auth.user)
             </p>
 
           </div>
+         )}
         
 
-        {/* {status === 'error' && (
+        {status === 'error' && (
           <div className='flex flex-col items-center'>
 
             <XCircle className='w-24 h-24 text-red-400 mb-6' />
@@ -101,7 +105,7 @@ const user=useSelector(state=>state.auth.user)
             </p>
 
           </div>
-        )} */}
+        )}
 
       </div>
 
