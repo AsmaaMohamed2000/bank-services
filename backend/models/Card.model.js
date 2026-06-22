@@ -46,10 +46,17 @@ const cardSchema = new mongoose.Schema({
     },
 
     expiryDate: {
-        type: String,
+        type: Date,
         required: true
     },
-
+isReplaced:{
+    type:Boolean,
+    default:false
+},
+replacedBy:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Card'
+},
     cvvHash: {
         type: String
     }

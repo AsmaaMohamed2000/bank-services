@@ -9,3 +9,19 @@ export const createCard=async(data)=>{
     return res.data
 
 }
+export const freese=async(user,id)=>{
+    const res=await axiosInstance.post(`/cards/freese/${id}`,user)
+    return res.data
+
+}
+export const block=async(user,id)=>{
+    const res=await axiosInstance.post(`/cards/block/${id}`,user)
+    return res.data
+
+}
+
+export const replace=async(user,id)=>{
+    const res=await axiosInstance.post(`/cards/replace/${id}`,user)
+    return res.data
+
+}

@@ -1,7 +1,10 @@
 const express=require('express')
-const {createCard,getCards} =require('../controllers/card.controller')
+const {createCard,getCards,freeseCard,blockCard,replaceCard} =require('../controllers/card.controller')
 const auth=require('../middlewares/authMiddleware')
 const router=express.Router()
 router.post('/createCard',createCard)
 router.post('/getCards',getCards)
+router.post('/freese/:id',freeseCard)
+router.post('/block/:id',blockCard)
+router.post('/replace/:id',replaceCard)
 module.exports=router

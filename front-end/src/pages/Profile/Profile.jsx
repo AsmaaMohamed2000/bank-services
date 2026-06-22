@@ -1,5 +1,6 @@
 import { motion, moveItem } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { getCards } from "../../services/cardService";
 import {
   Wallet,
   Mail,
@@ -15,17 +16,7 @@ import { createAcount, getAcount } from "../../services/acountService";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 function Profile() {
-   const [cards, setCard] = useState([{
-      cardNumber: "77766655544",
-      expiryDate: "12/12",
-      CVV: "123",
-      balance: 233333,
-    },{
-      cardNumber: "77766655544",
-      expiryDate: "12/12",
-      CVV: "123",
-      balance: 233333,
-    }]);
+   const [cards, setCard] = useState([]);
     const navigate=useNavigate()
     const user=useSelector(state=>state.auth.user)
     console.log(user)
@@ -73,6 +64,16 @@ useEffect(()=>{
       }
     }
     getAccounts()
+    const getAllCards=async()=>{
+      if(!user) return
+       try{
+    const result=await getCards(user)
+    setCard(result.cards)
+      }catch(err){
+    toast.error(err.response.data.message)
+      }
+    }
+    getAllCards()
    
 },[user])
 
@@ -199,7 +200,7 @@ useEffect(()=>{
           </h3>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-5">
+        {/* <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-5">
           <p className="text-gray-400 text-sm">
             Status
           </p>
@@ -207,7 +208,7 @@ useEffect(()=>{
           <h3 className="text-green-400 font-bold">
             Active
           </h3>
-        </div>
+        </div> */}
 
       </div>
       <div className="w-[90%] max-w-6xl mb-10">
@@ -272,7 +273,10 @@ useEffect(()=>{
     initial={{ opacity: 0, y: 30 }}
     animate={{ opacity: 1, y: 0 }} transition={{duration:1}}
   >
-
+<div className="flex gap-3 items-center mb-4">
+  <span className={`w-4 h-4 rounded-full ${item.status==='active'?'bg-green-600':item.status==='blocked'?'bg-red-600':'bg-yellow-500'}`}></span>
+  <span>{item.status}</span>
+</div>
     <motion.div
       onClick={() => setFlipped((prev)=>!prev)}
       animate={{ rotateY: flipped ? 180 : 0 }}

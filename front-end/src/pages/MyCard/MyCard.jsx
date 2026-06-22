@@ -1,10 +1,11 @@
 import { motion } from "framer-motion"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {  CreditCard,RefreshCw,Plus} from 'lucide-react'
 import { useSelector } from "react-redux";
 import { getAcount } from "../../services/acountService";
 import { toast } from "react-toastify";
-import { getCards,createCard } from "../../services/cardService";
+import { getCards,createCard ,freese,block,replace} from "../../services/cardService";
+import { space } from "postcss/lib/list";
 function MyCard() {
     const user = useSelector(state=>state.auth.user)
     const [cards, setCard] = useState([]);
@@ -19,6 +20,18 @@ function MyCard() {
     const formatted=String(num).replace(/\D/g,'')
     return formatted.replace(/(\d{4})(?=\d)/g,'$1 ')
   }
+  useEffect(()=>{
+const getAllCards=async()=>{
+  if(!user) return
+   try{
+const result=await getCards(user)
+setCard(result.cards)
+  }catch(err){
+toast.error(err.response.data.message)
+  }
+}
+getAllCards()
+  },[user])
   const getCard=async()=>{}
   const openModal=async()=>{
     if(!user) return
@@ -54,6 +67,45 @@ toast.error(err.response.data.message)
       setModal(false)
     }
    }
+   const freeseCard=async(cardId)=>{
+    if(!user||!cardId) return
+    try{
+      const res=await freese(user,cardId)
+      try{
+const result=await getCards(user)
+setCard(result.cards)
+  }catch(err){
+toast.error(err.response.data.message)
+  }}catch(err){
+    toast.error(err.response.data.message)
+  }
+    }
+    const blockCard=async(cardId)=>{
+    if(!user||!cardId) return
+    try{
+      const res=await block(user,cardId)
+      try{
+const result=await getCards(user)
+setCard(result.cards)
+  }catch(err){
+toast.error(err.response.data.message)
+  }}catch(err){
+    toast.error(err.response.data.message)
+  }
+    }
+   const replaceCaed=async(id)=>{
+      if(!user||!id) return
+    try{
+      const res=await replace(user,id)
+      try{
+const result=await getCards(user)
+setCard(result.cards)
+  }catch(err){
+toast.error(err.response.data.message)
+  }}catch(err){
+    toast.error(err.response.data.message)
+  }
+   }
   return (
     <div className="pt-24 min-h-screen w-full bg-linear-to-br from-[#0a0f1f]  via-[#101a3a] to-[#1a237e] relative overflow-hidden flex  flex-col items-center justify-between  text-white relative overflow-hidden">
       <div className="md:w-full max-w-xl w-[300px] sm:w-[500px]">
@@ -62,15 +114,42 @@ toast.error(err.response.data.message)
   <CreditCard/> default card
 </h2>
 <div className="flex flex-col sm:flex-row gap-4">
-<button onClick={getCard} className="flex items-center sm:gap-2 gap-1 bg-white/10 hover:bg-white/20 text-white px-1 py-2 sm:px-3 sm:py-2 rounded-md " title="update"><RefreshCw size={16}/> update</button>
-<button onClick={openModal} className="flex cursor-pointer items-center sm:gap-2 gap-1 text-sm bg-yellow-400 hover:bg-yellow-500 text-black px-1 py-2 sm:px-3 sm:py-2 rounded-md  " title="create card"><Plus size={16}/> create </button>
+{/* <button onClick={getCard} className="flex items-center sm:gap-2 gap-1 bg-white/10 hover:bg-white/20 text-white px-1 py-2 sm:px-3 sm:py-2 rounded-md " title="update"><RefreshCw size={16}/> update</button> */}
+<button onClick={openModal} className="flex cursor-pointer items-center sm:gap-2 gap-1 text-sm bg-yellow-400 hover:bg-yellow-500 text-black px-1 py-2 sm:px-3 sm:py-2 rounded-md  " title="create card"><Plus size={16}/> create card</button>
 </div>
       </div>
      <div className="">
-{cards&&cards.length>=1?(cards.map((item)=>( <div className="mt-12 perspective-distant ">
+   
+{cards&&cards.length>=1?cards.map((item)=>(
+   <div className="mt-8 perspective-distant ">
+  
+ {item.status==='blocked'&&item.isReplaced&&(
+  <>
+   <span className="me-3">replaced</span>
+   <span className={`w-4 h-4 rounded-full bg-red-600`}></span>
+ 
+ 
+  <span>blocked</span>
+</>
+ )}
+  <div className="">
+ 
+   <div className={`flex gap-6 mb-6 items-center ${item.status!=='blocked'?'flex':'hidden'}` }>
+        <button onClick={()=>freeseCard(item._id)} className="flex items-center sm:gap-2 gap-1 bg-white/10 hover:bg-white/20 text-white px-1 py-2 sm:px-3 sm:py-2 rounded-md "><RefreshCw size={16}/> {item.isFrozen?'unFreese card':'freese card'}</button>
+<button onClick={()=>blockCard(item._id)} className="flex cursor-pointer items-center sm:gap-2 gap-1 text-sm bg-yellow-400 hover:bg-yellow-500 text-black px-1 py-2 sm:px-3 sm:py-2 rounded-md "><Plus size={16}/> {item.status==='active'?'block':''} </button>
+<div className="flex gap-3 items-center">
+  <span className={`w-4 h-4 rounded-full ${item.status==='active'?'bg-green-600':item.status==='blocked'?'bg-red-600':'bg-yellow-500'}`}></span>
+  <span>{item.status}</span>
+</div>
+      </div>
+      <div className={`flex gap-6 mb-6 items-center ${item.status==='blocked'&&!item.isReplaced?'flex':'hidden'}` }>
+        <button onClick={()=>replaceCaed(item._id)} className="flex items-center sm:gap-2 gap-1 bg-white/10 hover:bg-white/20 text-white px-1 py-2 sm:px-3 sm:py-2 rounded-md " ><RefreshCw size={16}/> replace</button>
+
+      </div>
 <motion.div onClick={()=>setFlipped((prev)=>!prev)} animate={{rotateY:flipped?180:0}}
   transition={{duration:1}} style={{transformStyle:'preserve-3d'}} className="cursor-pointer select-none"
   >
+    
 <div className="relative flex flex-col rounded-2xl p-3 sm:p-6 pb-12 text-white h-64 bg-linear-to-r from-indigo-600  via-purple-600 to-pink-500 " style={{backfaceVisibility:'hidden'}}>
 <div className="flex justify-between items-start ">
 <div className="flex items-center gap-3">
@@ -143,9 +222,15 @@ NeoBan   2026
 <div className="mt-6 text-sm text-white/80 cursor-pointer " onClick={()=>setFlipped((prev)=>!prev)}>
   press on card to show details
 </div>
-      </div>))):(<p className="mt-12 font-bold text-white text-md text-center">No Cards </p>)}
-     </div>
+      </div>
+      
+      
+      
+          </div>)):(<p className="mt-12 font-bold text-white text-md text-center">No Cards </p>)}
+ 
     </div>
+   
+   
     {
   modal && (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
@@ -192,8 +277,10 @@ NeoBan   2026
     </div>
   )
 }
-     </div>
+    </div> 
+  </div> 
   )
+
 }
 
 export default MyCard

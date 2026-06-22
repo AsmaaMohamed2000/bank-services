@@ -110,9 +110,175 @@ getCards : async (req, res) => {
         })
 
     }
+},
+freeseCard: async (req, res) => {
+    try {
+
+        const { id } = req.params
+        const  user  = req.body
+
+        const card = await Card.findOne({
+            _id: id,
+            user: user._id
+        })
+
+        if (!card) {
+            return res.status(404).json({
+                success: false,
+                message: "Card not found"
+            })
+        }
+
+        card.isFrozen = !card.isFrozen
+
+        await card.save()
+
+        res.status(200).json({
+            success: true,
+            message: card.isFrozen
+                ? "Card frozen successfully"
+                : "Card unfrozen successfully",
+            card
+        })
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        })
+
+    }
+},
+
+blockCard: async (req, res) => {
+    try {
+
+        const { id } = req.params
+        const  user  = req.body
+
+        const card = await Card.findOne({
+            _id: id,
+            user: user._id
+        })
+
+        if (!card) {
+            return res.status(404).json({
+                success: false,
+                message: "Card not found"
+            })
+        }
+
+        card.status = 'blocked'
+
+        await card.save()
+
+        res.status(200).json({
+            success: true,
+            message:'card is blocked successfully'
+            
+        })
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        })
+
+    }
+},
+ replaceCard :async (req, res) => {
+
+    const { id } = req.params
+const user=req.body
+    const oldCard = await Card.findById(id)
+
+    if (!oldCard) {
+        res.status(404).json({
+            success:false,
+            message:'card not found'
+        })
+        
+    }
+
+    if (oldCard.user.toString() !== user._id.toString()) {
+        res.status(403)
+        .json({
+            success:false,
+            message:'Not authorized'
+        })
+    }
+
+    if (oldCard.status !== "blocked") {
+        res.status(400).json({
+            success:false,
+            message:'Only blocked cards can be replaced'
+        })
+      
+    }
+
+    if (oldCard.isReplaced) {
+        res.status(400).json({
+            success:false,
+            message:'This card has already been replaced'
+        })
+       
+    }
+
+  
+    // let existingCard
+
+    // do {
+    //     cardNumber =
+    //         Math.floor(
+    //             1000000000000000 +
+    //             Math.random() * 9000000000000000
+    //         ).toString()
+
+    //     existingCard = await Card.findOne({ cardNumber })
+
+    // } while (existingCard)
+
+  
+
+    const expiryDate = new Date()
+
+    expiryDate.setFullYear(
+        expiryDate.getFullYear() + 5
+    )
+
+       const cardNumber = generateCardNumber()
+        const cvv = generateCVV()
+
+        const cvvHash = await bcrypt.hash(cvv, 10)
+
+        const newCard = await Card.create({
+            user: user._id,
+            account: oldCard.account._id,
+            cardNumber,
+            last4: cardNumber.slice(-4),
+            cardHolderName: user.fullName,
+            network: "visa",
+            expiryDate,
+            cvvHash
+        })
+
+    oldCard.isReplaced = true
+    oldCard.replacedBy = newCard._id
+
+    await oldCard.save()
+
+    res.status(201).json({
+        success: true,
+        message: "Card replaced successfully",
+        oldCardId: oldCard._id,
+        newCard
+    })
+
+}
 }
 
 
-}
 
 module.exports =cardController
