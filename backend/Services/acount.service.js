@@ -1,5 +1,5 @@
 const Account = require('../models/account.model')
-
+const Notification=require('../models/Notifications.model')
 function generateAccountNumber() {
     return Math.floor(
         1000000000 + Math.random() * 9000000000
@@ -19,6 +19,11 @@ let existingAccount
              user: user._id, accountType:rest.accountType ||'checking'
         })
          if (existingAccount) {
+             await Notification.create({
+                                user: user._id,
+                                title: "create account ",
+                                message: `Account already exists`
+                              })
             throw new Error('Account already exists')
         }
 
@@ -36,7 +41,11 @@ let existingAccount
             currency: 'EGP',
             accountType:rest.accountType ||'checking'
         })
-
+  await Notification.create({
+                                user: user._id,
+                                title: "create account ",
+                                message: `Account created successfully`
+                              })
         return account
     },
 

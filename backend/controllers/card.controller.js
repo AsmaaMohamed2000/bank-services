@@ -1,7 +1,7 @@
 const Account = require("../models/Account.model")
 const Card = require("../models/Card.model")
 const bcrypt = require("bcryptjs")
-
+const Notification=require('../models/Notifications.model')
 const generateCardNumber = () => {
     return Math.floor(
         1000000000000000 + Math.random() * 9000000000000000
@@ -13,6 +13,11 @@ const generateCVV = () => {
         100 + Math.random() * 900
     ).toString()
 }
+  const expiryDate = new Date()
+
+    expiryDate.setFullYear(
+        expiryDate.getFullYear() + 5
+    )
 
 const cardController={
     createCard : async (req, res) => {
@@ -33,6 +38,11 @@ console.log(accountID)
         })
 
         if (!account) {
+              await Notification.create({
+                    user:user._id,
+                    title: "create card failed",
+                    message: `Account not found`
+                  })
             return res.status(404).json({
                 success: false,
                 message: "Account not found"
@@ -44,6 +54,11 @@ console.log(accountID)
         })
 
         if (existingCard) {
+               await Notification.create({
+                    user:user._id,
+                    title: "create card failed",
+                    message: `This account already has a card`
+                  })
             return res.status(400).json({
                 success: false,
                 message: "This account already has a card"
@@ -62,10 +77,16 @@ console.log(accountID)
             last4: cardNumber.slice(-4),
             cardHolderName: user.fullName,
             network: "visa",
-            expiryDate: "12/30",
+            expiryDate,
             cvvHash
         })
+        
 console.log(card)
+   await Notification.create({
+                     user:user._id,
+                    title: "create card",
+                    message: `card created successfully`
+                  })
         res.status(201).json({
             success: true,
             message: "Card created successfully",
@@ -123,6 +144,11 @@ freeseCard: async (req, res) => {
         })
 
         if (!card) {
+               await Notification.create({
+                    user: user._id,
+                    title: "freeze card failed",
+                    message: `Card Not Found`
+                  })
             return res.status(404).json({
                 success: false,
                 message: "Card not found"
@@ -132,7 +158,13 @@ freeseCard: async (req, res) => {
         card.isFrozen = !card.isFrozen
 
         await card.save()
-
+   await Notification.create({
+                   user: user._id,
+                    title: "card frozen successfully",
+                    message:  card.isFrozen
+                ? "Card frozen successfully"
+                : "Card unfrozen successfully"
+                  })
         res.status(200).json({
             success: true,
             message: card.isFrozen
@@ -163,6 +195,11 @@ blockCard: async (req, res) => {
         })
 
         if (!card) {
+               await Notification.create({
+                    user: user._id,
+                    title: "block card failed",
+                    message: `Card Not Found`
+                  })
             return res.status(404).json({
                 success: false,
                 message: "Card not found"
@@ -172,7 +209,11 @@ blockCard: async (req, res) => {
         card.status = 'blocked'
 
         await card.save()
-
+   await Notification.create({
+                    user: user._id,
+                    title: "block card",
+                    message: `card is blocked successfully`
+                  })
         res.status(200).json({
             success: true,
             message:'card is blocked successfully'
@@ -195,6 +236,11 @@ const user=req.body
     const oldCard = await Card.findById(id)
 
     if (!oldCard) {
+          await Notification.create({
+                    user: user._id,
+                    title: "replace card failed",
+                    message: `Card Not Found`
+                  })
         res.status(404).json({
             success:false,
             message:'card not found'
@@ -211,6 +257,11 @@ const user=req.body
     }
 
     if (oldCard.status !== "blocked") {
+          await Notification.create({
+                    user: user._id,
+                    title: "replace card failed",
+                    message: `Only blocked cards can be replaced`
+                  })
         res.status(400).json({
             success:false,
             message:'Only blocked cards can be replaced'
@@ -219,7 +270,12 @@ const user=req.body
     }
 
     if (oldCard.isReplaced) {
-        res.status(400).json({
+         await Notification.create({
+                    user: user._id,
+                    title: "replace card failed",
+                    message: `This card has already been replaced`
+                  })
+     return   res.status(400).json({
             success:false,
             message:'This card has already been replaced'
         })
@@ -242,11 +298,11 @@ const user=req.body
 
   
 
-    const expiryDate = new Date()
+    // const expiryDate = new Date()
 
-    expiryDate.setFullYear(
-        expiryDate.getFullYear() + 5
-    )
+    // expiryDate.setFullYear(
+    //     expiryDate.getFullYear() + 5
+    // )
 
        const cardNumber = generateCardNumber()
         const cvv = generateCVV()
@@ -268,7 +324,11 @@ const user=req.body
     oldCard.replacedBy = newCard._id
 
     await oldCard.save()
-
+   await Notification.create({
+                    user: user._id,
+                    title: "replace card ",
+                    message: `Card replaced successfully`
+                  })
     res.status(201).json({
         success: true,
         message: "Card replaced successfully",

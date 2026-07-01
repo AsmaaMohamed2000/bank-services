@@ -18,14 +18,42 @@ const transferController = {
       const senderAccount = await Account.findOne({
         user: user._id
       })
+      
 
       if (!senderAccount) {
+                  const transaction = await Transaction.create({
+              sender: senderAccount._id,
+              initiatedBy: user._id,
+        
+              type: "transfer",
+        
+              sourceType: "account",
+              destinationType: rest.cardNumber
+          ? "card"
+          : "account",
+        
+              amount,
+        
+              balanceBefore:null,
+              balanceAfter: null,
+        
+              status: "failed",
+        
+              failureReason:'Account Not Found',
+        
+              processedAt: new Date(),
+            });
+              await Notification.create({
+              user: null,
+              title: "Transfer failed",
+              message:`Account Not Found `,
+            });
         return res.status(404).json({
           success: false,
           message: "Account not found"
         })
       }
-
+ const balanceBefore = senderAccount.balance
       let receiverAccount
 
       if (rest.cardNumber) {
@@ -35,6 +63,32 @@ const transferController = {
         })
 
         if (!receiverCard) {
+                  const transaction = await Transaction.create({
+            sender: senderAccount._id,
+              initiatedBy: user._id,
+        
+              type: "transfer",
+        
+              sourceType: "account",
+              destinationType:  "card",
+          
+        
+              amount,
+        
+              balanceBefore,
+              balanceAfter: senderAccount.balance,
+        
+              status: "failed",
+        
+              failureReason:'Receiver Card Not Found',
+        
+              processedAt: new Date(),
+            });
+              await Notification.create({
+              user:senderAccount.user,
+              title: "Transfer failed",
+              message:`Receiver Card Not Found `,
+            });
           return res.status(404).json({
             success: false,
             message: "Card not found"
@@ -61,6 +115,33 @@ const transferController = {
       }
 
       if (!receiverAccount) {
+                const transaction = await Transaction.create({
+              sender: senderAccount._id,
+              initiatedBy: user._id,
+        
+              type: "transfer",
+        
+              sourceType: "account",
+              destinationType: rest.cardNumber
+          ? "card"
+          : "account",
+        
+              amount,
+        
+              balanceBefore,
+              balanceAfter:senderAccount.balance,
+        
+              status: "failed",
+        
+              failureReason:'Receiver account not found',
+        
+              processedAt: new Date(),
+            });
+              await Notification.create({
+              user: senderAccount.user,
+              title: "Transfer failed",
+              message:`Receiver account not found `,
+            });
         return res.status(404).json({
           success: false,
           message: "Receiver account not found"
@@ -71,6 +152,33 @@ const transferController = {
         senderAccount._id.toString() ===
         receiverAccount._id.toString()
       ) {
+               const transaction = await Transaction.create({
+             sender: senderAccount._id,
+              initiatedBy: user._id,
+        
+              type: "transfer",
+        
+              sourceType: "account",
+              destinationType: rest.cardNumber
+          ? "card"
+          : "account",
+        
+              amount,
+        
+              balanceBefore,
+              balanceAfter: senderAccount.balance,
+        
+              status: "failed",
+        
+              failureReason:"You can't transfer to yourself",
+        
+              processedAt: new Date(),
+            });
+              await Notification.create({
+              user: senderAccount.user,
+              title: "Transfer failed",
+              message:`You can't transfer to yourself `,
+            });
         return res.status(400).json({
           success: false,
           message: "You can't transfer to yourself"
@@ -78,13 +186,41 @@ const transferController = {
       }
 
       if (senderAccount.balance < amount) {
+               const transaction = await Transaction.create({
+              sender: senderAccount._id,
+              initiatedBy: user._id,
+        
+              type: "transfer",
+        
+              sourceType: "account",
+              destinationType: rest.cardNumber
+          ? "card"
+          : "account",
+        
+              amount,
+        
+              balanceBefore,
+              balanceAfter: senderAccount.balance,
+        
+              status: "failed",
+        
+              failureReason:"Insufficient balance",
+        
+              processedAt: new Date(),
+            });
+              await Notification.create({
+              user: senderAccount.user,
+              title: "Transfer failed",
+              message:`Insufficient balance `,
+            })
+
         return res.status(400).json({
           success: false,
           message: "Insufficient balance"
         })
       }
 
-      const balanceBefore = senderAccount.balance
+     
 
       senderAccount.balance -= Number(amount)
       receiverAccount.balance += Number(amount)
@@ -95,7 +231,7 @@ const transferController = {
       const trx = await Transaction.create({
         sender: senderAccount._id,
         receiver: receiverAccount._id,
-        initiatedBy: req._id,
+        initiatedBy: user._id,
 
         type: "transfer",
 
